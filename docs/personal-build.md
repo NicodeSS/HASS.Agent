@@ -44,10 +44,14 @@ Rollback restores the saved binaries and, if a migration occurred, matching conf
 ## Build and update commands
 
 Prerequisites: PowerShell, Git, a .NET SDK capable of targeting .NET 8, the .NET 8
-Windows Desktop runtime, and Windows SDK 10.0.22621. The Windows SDK is required by
-the upstream CsWinRT build. This Windows host uses WinGet package
-`Microsoft.WindowsSDK.10.0.22621`; it is a local build prerequisite, not an extension
-of the shared dotfiles Windows installer.
+Windows Desktop runtime, and a Windows SDK supplying CsWinRT metadata. The upstream
+default requests SDK 10.0.22621. On this host its full installation exceeded the
+bounded background wait while downloading components. The approved build choice is
+the already installed SDK 10.0.26100.0, passed explicitly as
+`-WindowsMetadataVersion 10.0.26100.0`. This changes the CsWinRT metadata source;
+the project's .NET 8 / Windows 10.0.22621 target remains unchanged. Without this
+argument the upstream metadata selection is preserved. The WinGet SDK installation
+is local state, outside the shared dotfiles Windows installer.
 
 From a clean committed checkout on `personal`:
 
@@ -56,8 +60,8 @@ git fetch upstream
 git log --oneline HEAD..upstream/main
 git merge upstream/main
 dotnet run --project tests/HASS.Agent.Audio.RegressionTests
-.\scripts\Build-Personal.ps1 -Version 2.2.1-personal.1 -WhatIf
-.\scripts\Build-Personal.ps1 -Version 2.2.1-personal.1
+.\scripts\Build-Personal.ps1 -Version 2.2.1-personal.1 -WindowsMetadataVersion 10.0.26100.0 -WhatIf
+.\scripts\Build-Personal.ps1 -Version 2.2.1-personal.1 -WindowsMetadataVersion 10.0.26100.0
 ```
 
 Choose the version for the current upstream base and increment the personal suffix.

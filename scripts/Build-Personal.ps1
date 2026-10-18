@@ -3,7 +3,9 @@ param(
     [Parameter(Mandatory)]
     [ValidatePattern('^\d+\.\d+\.\d+-personal\.\d+$')]
     [string]$Version,
-    [string]$OutputDirectory
+    [string]$OutputDirectory,
+    [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')]
+    [string]$WindowsMetadataVersion
 )
 
 $ErrorActionPreference = 'Stop'
@@ -25,10 +27,12 @@ try {
     dotnet run --project tests/HASS.Agent.Audio.RegressionTests -c Release
     if ($LASTEXITCODE) { throw 'Audio regression checks failed.' }
 
+    $metadataArgument = @()
+    if ($WindowsMetadataVersion) { $metadataArgument = @("-p:CsWinRTWindowsMetadata=$WindowsMetadataVersion") }
     dotnet publish src/HASS.Agent/HASS.Agent/HASS.Agent.csproj -c Release `
         -f net8.0-windows10.0.22621.0 -r win-x64 --no-self-contained `
         -p:Platform=x64 "-p:Version=$Version" "-p:InformationalVersion=$Version+$sourceCommit" `
-        -o (Join-Path $OutputDirectory 'client')
+        -o (Join-Path $OutputDirectory 'client') @metadataArgument
     if ($LASTEXITCODE) { throw 'Client publish failed; output is incomplete.' }
 
     $clientExe = Join-Path $OutputDirectory 'client/HASS.Agent.exe'
@@ -40,6 +44,7 @@ try {
         sourceCommit = $sourceCommit
         upstreamBase = (git merge-base HEAD upstream/main)
         sdk = $sdkVersion
+        windowsMetadataOverride = $WindowsMetadataVersion
         runtimeIdentifier = 'win-x64'
         builtAtUtc = [DateTime]::UtcNow.ToString('o')
         clientSha256 = (Get-FileHash -LiteralPath $clientExe -Algorithm SHA256).Hash
