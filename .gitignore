@@ -349,3 +349,6 @@ healthchecksdb
 MigrationBackup/
 
 src/.svn/
+
+# Local personal builds; source branches remain suitable for public GitHub use.
+artifacts/

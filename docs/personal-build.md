@@ -41,4 +41,39 @@ Rollback restores the saved binaries and, if a migration occurred, matching conf
 - Both microphone automations retain their conditions and switch in both directions.
 - Existing MQTT entities and configured commands survive deployment.
 
-Build commands and the verification evidence are added when exercised.
+## Build and update commands
+
+Prerequisites: PowerShell, Git, a .NET SDK capable of targeting .NET 8, the .NET 8
+Windows Desktop runtime, and Windows SDK 10.0.22621. The Windows SDK is required by
+the upstream CsWinRT build. This Windows host uses WinGet package
+`Microsoft.WindowsSDK.10.0.22621`; it is a local build prerequisite, not an extension
+of the shared dotfiles Windows installer.
+
+From a clean committed checkout on `personal`:
+
+```powershell
+git fetch upstream
+git log --oneline HEAD..upstream/main
+git merge upstream/main
+dotnet run --project tests/HASS.Agent.Audio.RegressionTests
+.\scripts\Build-Personal.ps1 -Version 2.2.1-personal.1 -WhatIf
+.\scripts\Build-Personal.ps1 -Version 2.2.1-personal.1
+```
+
+Choose the version for the current upstream base and increment the personal suffix.
+The script checks clean source, runs the audio regression, and publishes the x64
+client into ignored `artifacts/<version>/client`, with commit, SDK and binary hashes
+in `build.json`. It refuses to overwrite an existing output. A failed publish leaves
+an incomplete output for diagnosis; use a new output directory after resolving it.
+The script builds the client and its shared assembly. It does not deploy, change
+runtime configuration, update the Satellite Service, or publish GitHub releases.
+
+Copy the validated client output into the stopped installed client directory,
+preserving its `config`, `logs`, and `cache` directories. Before deployment, verify
+that the build output contains none of those runtime directories. Keep an exact
+binary backup outside the installation; protect any configuration backup with
+Windows DPAPI under the current user, since app settings can contain credentials.
+Then start the existing executable path, verify its product version and MQTT
+connection, and compare Windows default-input state with HA while running both
+automations with `skip_condition: false`. Manual triggering verifies conditions and
+actions; physical bed/seat transitions require a separate user acceptance check.
