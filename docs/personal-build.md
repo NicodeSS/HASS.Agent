@@ -45,9 +45,8 @@ Rollback restores the saved binaries and, if a migration occurred, matching conf
 
 Prerequisites: PowerShell, Git, a .NET SDK capable of targeting .NET 8, the .NET 8
 Windows Desktop runtime, and a Windows SDK supplying CsWinRT metadata. The upstream
-default requests SDK 10.0.22621. On this host its full installation exceeded the
-bounded background wait while downloading components. The approved build choice is
-the already installed SDK 10.0.26100.0, passed explicitly as
+default requests SDK 10.0.22621. On this host use the installed SDK 10.0.26100.0,
+passed explicitly as
 `-WindowsMetadataVersion 10.0.26100.0`. This changes the CsWinRT metadata source;
 the project's .NET 8 / Windows 10.0.22621 target remains unchanged. Without this
 argument the upstream metadata selection is preserved. The WinGet SDK installation
@@ -81,7 +80,3 @@ Then start the existing executable path, verify its product version and MQTT
 connection, and compare Windows default-input state with HA while running both
 automations with `skip_condition: false`. Manual triggering verifies conditions and
 actions; physical bed/seat transitions require a separate user acceptance check.
-
-For the initial audio fix's build and installed-runtime evidence, see
-[audio-session-verification.md](audio-session-verification.md). Read it when
-diagnosing a recurrence or checking the original deployment and rollback boundary.
