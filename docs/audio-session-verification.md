@@ -61,8 +61,39 @@ The live check therefore retained the original failure condition.
 
 The seated sensor repeatedly toggled during the first physical test, causing
 repeated presses of the same target while the 20-second input report was pending.
-That separate sensor issue remains in the backlog; no sensor or trigger semantics
-were changed to hide it.
+The user subsequently confirmed these transitions are normal. They are not a
+sensor defect. The original client acceptance did not change sensor semantics.
+
+## Automation follow-up
+
+The approved HA behavior for this single-occupant room is to switch only when
+one position reports occupied and the other explicitly reports clear. If both
+positions report occupied, or both report clear, retain the selected input.
+Only switch between the two managed microphone inputs; preserve manually selected
+other inputs and reject unknown/unavailable reports. No sensor debounce is added.
+
+Each of the two existing automations checks its own occupied position, the other
+clear position, and the exact opposite input. Re-evaluate on all three relevant
+changes: own position becomes occupied, the other clears, or input telemetry
+reports the opposite microphone. This allows a previously blocked location
+transition to be reconsidered when overlapping occupancy resolves, or when an
+earlier command's delayed input report arrives. Actions and automation IDs remain
+unchanged. Repeated same-target commands before telemetry updates are still
+possible; this follow-up does not claim to suppress them.
+
+Both updated configurations were saved through the HA configuration API, read
+back exactly, and remained enabled. Thirty-three checks passed on the actual HA
+automation engine using isolated occupancy/input entities and event-only actions:
+all four occupancy combinations against both managed inputs, a manual input and
+unknown/unavailable; all six trigger paths; overlapping occupancy resolution;
+and delayed input acknowledgements after changing position in both directions.
+The exact temporary automations and entities were removed and absence verified.
+
+The live desk check selected Alternative first, then the updated automation
+restored Optimized using real sensor conditions. HA and direct Windows readback
+agreed. The updated bed path was covered by the isolated engine tests; the
+earlier physical bed acceptance above predates this automation follow-up and was
+not repeated. The client binary and sensor configuration were unchanged.
 
 ## Rollback
 
