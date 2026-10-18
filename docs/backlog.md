@@ -2,7 +2,10 @@
 
 ## Audio device telemetry stops on a lingering session — high priority
 
-Status: in progress. Prerequisite for completing the two microphone automations.
+Status: source fix and regression complete; full client build and live validation
+pending. Prerequisite for completing the two microphone automations.
+Upstream contribution: [PR #507](https://github.com/hass-agent/HASS.Agent/pull/507),
+related to [Issue #179](https://github.com/hass-agent/HASS.Agent/issues/179).
 
 HASS.Agent 2.2.1 calls `Process.GetProcessById` while resolving an unnamed audio
 session. A session can outlive its process. The resulting `ArgumentException`
