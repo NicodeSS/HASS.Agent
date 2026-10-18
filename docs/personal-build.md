@@ -81,3 +81,7 @@ Then start the existing executable path, verify its product version and MQTT
 connection, and compare Windows default-input state with HA while running both
 automations with `skip_condition: false`. Manual triggering verifies conditions and
 actions; physical bed/seat transitions require a separate user acceptance check.
+
+For the initial audio fix's build and installed-runtime evidence, see
+[audio-session-verification.md](audio-session-verification.md). Read it when
+diagnosing a recurrence or checking the original deployment and rollback boundary.
